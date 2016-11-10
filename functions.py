@@ -4,6 +4,7 @@ The Base class with all the methods regarding app functionality.
 import psycopg2
 import json
 from firebase import firebase
+from tabulate import tabulate
 
 class Notes(object):
 
@@ -22,10 +23,10 @@ class Notes(object):
 	# A method to implement retrieving a note from the Database
 	def view_note(self, id):
 		cur = self.conn.cursor()
-		cur.execute("SELECT * FROM notes_table where id = %s", [id])
+		cur.execute("SELECT content->'title', content->'note' FROM notes_table where id = %s", [id])
 		result_row = cur.fetchall()
 		if (result_row):
-			print json.dumps(result_row, indent=4)
+			print tabulate(result_row, headers=["Title", "Content"], tablefmt="fancy_grid")
 		else:
 			print ('*** sorry you dont have a note to the given ID! ***')
 		cur.close()
@@ -44,10 +45,9 @@ class Notes(object):
 	# A method to implement retrieving all notes from the Database
 	def retrieve_notes(self):
 		cur = self.conn.cursor()
-		cur.execute("SELECT content FROM notes_table")
+		cur.execute("SELECT content->'title', content->'note' from notes_table")
 		result_rows = cur.fetchall()
-		for row in result_rows:
-			print json.dumps(row)
+		print tabulate(result_rows, headers=["Title", "Content"], tablefmt="fancy_grid")
 		cur.close()
 		self.conn.commit()
 
@@ -68,6 +68,9 @@ class Notes(object):
 		result = fibase.post('/', json.dumps(result_rows))
 		print ('*** Done ***')
 
+	def export(self):
+		pass
+
 if __name__ == "__main__":
 	k = Notes()
-	k.retrieve_notes()
+	k.view_note(1)
