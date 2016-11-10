@@ -5,6 +5,7 @@ import psycopg2
 import json
 from firebase import firebase
 from tabulate import tabulate
+import csv
 
 class Notes(object):
 
@@ -54,9 +55,11 @@ class Notes(object):
 	# A method to implement searching a note from the Database
 	def search_note(self, param):
 		cur = self.conn.cursor()
-		cur.execute("SELECT * FROM notes_table where content->>'title' like (%s)", [param])
+		cur.execute("SELECT content->'title', content->'note' FROM notes_table where content->>'title' like (%s)", [param])
 		result_rows = cur.fetchall()
-		print json.dumps(result_rows)
+		print tabulate(result_rows, headers=["Title", "Content"], tablefmt="fancy_grid")
+		cur.close()
+		self.conn.commit()
 
 	# A method to implement synching notes with firebase
 	def sync(self):
@@ -68,9 +71,19 @@ class Notes(object):
 		result = fibase.post('/', json.dumps(result_rows))
 		print ('*** Done ***')
 
+	# A method to implement exporting notes
 	def export(self):
-		pass
+		file_name = raw_input("kindly provide a name to the notes: ")
+		cur = self.conn.cursor()
+		cur.execute("SELECT content->'title' as title, content->'note' as note from notes_table")
+		result_rows = cur.fetchall()
+		with open(file_name +'.csv', 'w') as f:
+			writer = csv.writer(f)
+			writer.writerow(['title', 'note'])
+			writer.writerows(result_rows)
+		cur.close()
+		self.conn.commit()
 
 if __name__ == "__main__":
 	k = Notes()
-	k.view_note(1)
+	k.export()
