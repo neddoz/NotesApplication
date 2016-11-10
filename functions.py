@@ -1,6 +1,5 @@
 import psycopg2
 import json
-from tabulate import tabulate
 from firebase import firebase
 
 
@@ -28,7 +27,7 @@ class Notes(object):
 
 	def save_note(self, title):
 		note = raw_input('type in the contents of your note>>>')
-		json_data = {"title":title, "note":note}	
+		json_data = {"note":note,"title":title}	
 		cur = self.conn.cursor()
 		cur.execute("""INSERT INTO notes_table(content) VALUES (%s)""", [json.dumps(json_data)])
 		print ('*** Note saved successfully! ***')
@@ -37,17 +36,10 @@ class Notes(object):
 
 	def retrieve_notes(self):
 		cur = self.conn.cursor()
-		cur.execute("SELECT * FROM notes_table")
+		cur.execute("SELECT content FROM notes_table")
 		result_rows = cur.fetchall()
-		# l = []
-		# if (result_rows):
-		# 	for value in result_rows:
-		# 		l.append(value[1])
-		# else:
-		# 	print ('*** sorry you dont have any notes! ***')
-		data = json.dumps(result_rows)
-		print(data)
-		# print tabulate(data,headers=['Id','Content'],tablefmt='fancy_grid')
+		for row in result_rows:
+			print json.dumps(row)
 		cur.close()
 		self.conn.commit()
 
@@ -62,9 +54,10 @@ class Notes(object):
 		cur.execute("SELECT content FROM notes_table")
 		result_rows = cur.fetchall()
 		fibase = firebase.FirebaseApplication('https://notes-74f87.firebaseio.com/')
-		result = fibase.post('/', {"title":"kayeli", "note":"kayeli is good"})
-		print (result)
+		print ('*** Just a moment your notes are being synced! ***')
+		result = fibase.post('/', json.dumps(result_rows))
+		print ('*** Done ***')
 
-# if __name__ == "__main__":
-# 	k = Notes('title3', 'This is the third Json data')
-# 	k.search_note('title3')
+if __name__ == "__main__":
+	k = Notes()
+	k.retrieve_notes()
