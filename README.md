@@ -19,7 +19,7 @@
 6. python-firebase: A helper to making API requests to firebase
 
 # Installation and Setup
-*Navigate to a directory of your choice on the terminal
+## Navigate to a directory of your choice on the terminal
 * Clone the respository
 * Navigate to the repo's folder on your computer
 * Using virtual environment: pip install -r requirements.txt
