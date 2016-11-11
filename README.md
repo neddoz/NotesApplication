@@ -19,12 +19,14 @@
 6. python-firebase: A helper to making API requests to firebase
 
 # Installation and Setup
-## Navigate to a directory of your choice on the terminal
-* Close the respository
+*Navigate to a directory of your choice on the terminal
+* Clone the respository
 * Navigate to the repo's folder on your computer
 * Using virtual environment: pip install -r requirements.txt
 * Next is to set up the databse by exporting the db.sql file into postgresql and the way to do it is just issue the folowing command in while inside the repo directory: psql -h hostname -d databasename -U username -f db.sql.
 * Find the functions.py file and pass the credentials regarding a username and password for accessiblity of the database by the application. 
 *Acivate the virtual environment by issuing the following command: . venv/bin/activate
 * Run the app by keying in the following command on terminal(when the virtual environment is activated): python my_program.py -i
+
+# Thats it!
 
