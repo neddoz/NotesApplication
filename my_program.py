@@ -12,6 +12,8 @@ Usage:
     notes view <note_id>
     notes delete <note_id>
     notes sync
+    notes export
+    notes import
 Options:
     -i, --interactive  Interactive Mode
     -h, --help  Show this screen and exit.
@@ -22,6 +24,8 @@ import sys
 import cmd
 from docopt import docopt, DocoptExit
 from functions import Notes
+from pyfiglet import Figlet,figlet_format
+from termcolor import cprint
 
 
 def docopt_cmd(func):
@@ -56,6 +60,9 @@ def docopt_cmd(func):
 
 
 class MyInteractive (cmd.Cmd):
+    f = Figlet(font = 'bubble')
+    print(cprint(figlet_format("Hello!", font = 'broadway'),'cyan'))
+    print('******************************************')
     intro = 'Welcome to the Notes Taking Application!' \
         + ' (type help for a list of commands.)'
     prompt = '(note) '
@@ -97,10 +104,22 @@ class MyInteractive (cmd.Cmd):
         """
         self.note.sync()
 
+    @docopt_cmd
+    def do_export(self, arg):
+        """Usage: export
+        """
+        self.note.export()
+
+    def do_import(self, arg):
+        """Usage: import
+        """
+        self.note.import_file()
+
     def do_quit(self, arg):
         """Quits out of Interactive Mode."""
-
+        print('************************')
         print('Thank you! Good Bye!')
+        print('************************')
         exit()
 
 opt = docopt(__doc__, sys.argv[1:])

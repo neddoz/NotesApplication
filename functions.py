@@ -6,6 +6,8 @@ import json
 from firebase import firebase
 from tabulate import tabulate
 import csv
+from time import sleep
+from tqdm import tqdm
 
 class Notes(object):
 
@@ -38,8 +40,9 @@ class Notes(object):
 		note = raw_input('type in the contents of your note>>>')
 		json_data = {"note":note,"title":title}	
 		cur = self.conn.cursor()
-		cur.execute("""INSERT INTO notes_table(content) VALUES (%s)""", [json.dumps(json_data)])
+		note_id = cur.execute("""INSERT INTO notes_table(content) VALUES (%s) Returning id""", [json.dumps(json_data)])
 		print ('*** Note saved successfully! ***')
+		print(note_id)
 		cur.close()
 		self.conn.commit()
 
@@ -67,8 +70,12 @@ class Notes(object):
 		cur.execute("SELECT content FROM notes_table")
 		result_rows = cur.fetchall()
 		fibase = firebase.FirebaseApplication('https://notes-74f87.firebaseio.com/')
-		print ('*** Just a moment your notes are being synced! ***')
 		result = fibase.post('/', json.dumps(result_rows))
+		print ('*** Just a moment your notes are being synced! ***')
+
+		for i in tqdm(range(500)):
+			sleep(0.01)
+
 		print ('*** Done ***')
 
 	# A method to implement exporting notes
@@ -84,6 +91,32 @@ class Notes(object):
 		cur.close()
 		self.conn.commit()
 
+	def import_file(self):
+		# Check to see first the given directory is correct
+		try:
+			file_name = raw_input('kindly key in the file location: ')
+			with open(file_name, 'rb') as csvfile:
+				rows = csv.reader(csvfile, quotechar='|')
+				for row in rows:
+					self.save_imported_notes(row[0], row[1])
+			# Just for a good UI
+			print ('*** Just a moment your notes are being synced! ***')
+		
+			for i in tqdm(range(500)):
+				sleep(0.01)
+
+			print ('*** Done ***')
+		# if the directory given is wrong
+		except IOError:
+			print ('sorry buddy there is no such file in that directory')
+
+	# A utility function to insert data read from a csv
+	def save_imported_notes(self, title, note):
+		cur = self.conn.cursor()
+		json_data = {"note":note,"title":title}
+		cur.execute("""INSERT INTO notes_table(content) VALUES (%s)""", [json.dumps(json_data)])
+		cur.close()
+		self.conn.commit()
 if __name__ == "__main__":
 	k = Notes()
-	k.export()
+	k.import_file()
