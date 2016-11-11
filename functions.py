@@ -63,7 +63,7 @@ class Notes(object):
 		if result_rows:
 			print('*** retrieving records matching your search! ***')
 
-			for i in tqdm(range(500)):
+			for i in tqdm(range(200)):
 				sleep(0.01)
 
 			print tabulate(result_rows, headers=["Title", "Content"], tablefmt="fancy_grid")
@@ -96,6 +96,9 @@ class Notes(object):
 			writer = csv.writer(f)
 			writer.writerow(['title', 'note'])
 			writer.writerows(result_rows)
+		print('*** Just a moment your notes are being exported ****')
+		for i in tqdm(range(200)):
+				sleep(0.01)
 		cur.close()
 		self.conn.commit()
 
@@ -110,7 +113,7 @@ class Notes(object):
 			# Just for a good UI
 			print ('*** Just a moment your notes are being synced! ***')
 		
-			for i in tqdm(range(500)):
+			for i in tqdm(range(200)):
 				sleep(0.01)
 
 			print ('*** Done ***')
