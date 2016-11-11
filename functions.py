@@ -128,6 +128,3 @@ class Notes(object):
 		cur.execute("""INSERT INTO notes_table(content) VALUES (%s)""", [json.dumps(json_data)])
 		cur.close()
 		self.conn.commit()
-if __name__ == "__main__":
-	k = Notes()
-	k.import_file()
