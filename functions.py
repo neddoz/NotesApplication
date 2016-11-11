@@ -42,7 +42,6 @@ class Notes(object):
 		cur = self.conn.cursor()
 		note_id = cur.execute("""INSERT INTO notes_table(content) VALUES (%s) Returning id""", [json.dumps(json_data)])
 		print ('*** Note saved successfully! ***')
-		print(note_id)
 		cur.close()
 		self.conn.commit()
 
@@ -111,7 +110,7 @@ class Notes(object):
 				for row in rows:
 					self.save_imported_notes(row[0], row[1])
 			# Just for a good UI
-			print ('*** Just a moment your notes are being synced! ***')
+			print ('*** Just a moment your notes are being Imported! ***')
 		
 			for i in tqdm(range(200)):
 				sleep(0.01)
