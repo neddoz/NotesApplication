@@ -60,7 +60,15 @@ class Notes(object):
 		cur = self.conn.cursor()
 		cur.execute("SELECT content->'title', content->'note' FROM notes_table where content->>'title' like (%s)", [param])
 		result_rows = cur.fetchall()
-		print tabulate(result_rows, headers=["Title", "Content"], tablefmt="fancy_grid")
+		if result_rows:
+			print('*** retrieving records matching your search! ***')
+
+			for i in tqdm(range(500)):
+				sleep(0.01)
+
+			print tabulate(result_rows, headers=["Title", "Content"], tablefmt="fancy_grid")
+		else:
+			print ('*** There are no records matching your search! Try a different search ***')
 		cur.close()
 		self.conn.commit()
 
@@ -73,7 +81,7 @@ class Notes(object):
 		result = fibase.post('/', json.dumps(result_rows))
 		print ('*** Just a moment your notes are being synced! ***')
 
-		for i in tqdm(range(500)):
+		for i in tqdm(range(200)):
 			sleep(0.01)
 
 		print ('*** Done ***')
